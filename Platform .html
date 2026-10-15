@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="kk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>ПГС-26К · Студент порталы</title><style>
+:root{--bg:#f3f6fb;--card:#fff;--tx:#0b1b33;--mu:#5b6b85;--ac:#1683ff;--bd:#d7e0ee;--er:#c0362c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#071a33;--card:#0b2a52;--tx:#eaf2ff;--mu:#9db3d3;--ac:#4aa3ff;--bd:#1b4278;--er:#ff7a70}}
+:root[data-theme="dark"]{--bg:#071a33;--card:#0b2a52;--tx:#eaf2ff;--mu:#9db3d3;--ac:#4aa3ff;--bd:#1b4278;--er:#ff7a70}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:14px 16px;font-weight:700;font-size:18px;background:linear-gradient(90deg,#0b3b82,#1683ff);color:#fff;display:flex;justify-content:space-between;align-items:center}
+header button{background:#ffffff33;padding:6px 10px;font-size:13px}
+main{padding:12px 14px 84px;max-width:560px;margin:auto}
+h2{font-size:13px;color:var(--mu);margin:16px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:6px 0}
+.dim{opacity:.5}.mu{color:var(--mu)}.er{color:var(--er)}
+.f{display:flex;gap:6px;margin-top:6px}
+input,select{width:100%;padding:9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit;margin-top:6px}
+.f input{margin:0}
+button{padding:9px 12px;border:0;border-radius:8px;background:var(--ac);color:#fff;font:inherit;cursor:pointer;white-space:nowrap}
+button.x{background:transparent;color:var(--er);padding:2px 6px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:14px 4px}nav .on{color:var(--ac);font-weight:700}
+#t{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#000c;color:#fff;padding:8px 14px;border-radius:20px;opacity:0;transition:.3s;pointer-events:none}
+</style></head><body><div id="app"></div><div id="t"></div><script>
+const U='https://zptwzwvxwhyylalnvghr.supabase.co',K='sb_publishable_uqYCRyTb5tk9QGq4Cnu5bA_ML9pANmt';
+let tk='',admin=false,nm='',us=[],tab='sch',cfg={sub:[],les:[],rk:[]},me={g:{},r:{}},ST=[];
+try{tk=localStorage.getItem('pgs_t')||''}catch(e){}
+const $=i=>document.getElementById(i);
+const D=['Жексенбі','Дүйсенбі','Сейсенбі','Сәрсенбі','Бейсенбі','Жұма','Сенбі'];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sn=id=>(cfg.sub.find(s=>s.id==id)||{name:'?'}).name;
+const hm=t=>{const[a,b]=t.split(':');return +a*60+ +b};
+const nowM=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()};
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pt=s=>s>=95?4:s>=90?3.67:s>=85?3.33:s>=80?3:s>=75?2.67:s>=70?2.33:s>=65?2:s>=60?1.67:s>=55?1.33:s>=50?1:0;
+const uidn=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const lo=d=>cfg.les.filter(l=>l.d==d).sort((a,b)=>hm(a.s)-hm(b.s));
+function toast(t){const e=$('t');e.textContent=t;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,1800)}
+async function api(f,b){const r=await fetch(U+'/rest/v1/rpc/'+f,{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null}
+async function sc(){try{await api('app_save_cfg',{t:tk,d:cfg});toast('Сақталды')}catch(e){toast('Сақталмады')}render()}
+async function sv(){try{await api('app_save_me',{t:tk,d:me});toast('Сақталды')}catch(e){toast('Сақталмады')}render()}
+const ck=v=>{if(v!==''&&!isNaN(v)&&v>=0&&v<=100)return true;toast('Балл 0-ден 100-ге дейін');return false};
+async function load(){
+ try{const s=await api('app_state',{t:tk});
+  if(!s){tk='';try{localStorage.removeItem('pgs_t')}catch(e){}return render()}
+  cfg=Object.assign({sub:[],les:[],rk:[]},s.cfg||{});me=Object.assign({g:{},r:{}},s.me||{});admin=!!s.admin;nm=s.name||'';us=s.users||[];
+ }catch(e){toast('Байланыс жоқ')}
+ render();
+}
+async function lg(){
+ try{const r=await api('app_login',{u:$('lu').value,p:$('lp').value});
+  if(!r){toast('Логин немесе пароль қате');return}
+  tk=r.token;try{localStorage.setItem('pgs_t',tk)}catch(e){}await load();
+ }catch(e){toast('Байланыс жоқ')}
+}
+function out(){tk='';try{localStorage.removeItem('pgs_t')}catch(e){}render()}
+function row(l,dim){return `<div class="c ${dim?'dim':''}"><b>${l.s}–${l.e}</b> ${esc(sn(l.sub))} <span class="mu">${esc(l.r||'')}</span></div>`}
+function vSch(){
+ if(!cfg.les.length)return '<div class="c mu">Кесте әлі қосылмаған.'+(admin?' «Админ» бөлімінде сабақ қос.':'')+'</div>';
+ const n=new Date(),m=nowM();let h='';
+ for(let k=0;k<8;k++){
+  const d=(n.getDay()+k)%7,ls=lo(d);
+  if(k==0&&!ls.some(l=>hm(l.e)>m))continue;
+  if(!ls.length)continue;
+  h+=`<h2>${k==0?'Бүгін':k==1?'Ертең':'Келесі'} · ${D[d]}</h2>`+ls.map(l=>row(l,k==0&&hm(l.e)<=m)).join('');break;
+ }
+ h+='<details><summary class="mu">Толық кесте</summary>'+[1,2,3,4,5,6].map(d=>lo(d).length?`<h2>${D[d]}</h2>`+lo(d).map(l=>row(l)).join(''):'').join('')+'</details>';
+ return h||'<div class="c mu">Жақын күндері сабақ жоқ.</div>';
+}
+function vGr(){
+ const n=new Date(),m=nowM();let h='';
+ const op=cfg.rk.filter(r=>r.open);
+ if(op.length)h+='<h2>Рубежка / сессия</h2>'+op.map(r=>`<div class="c"><b>${esc(sn(r.sub))}</b> · ${esc(r.name)}<div class="f"><input id="r_${r.id}" type="number" min="0" max="100" value="${me.r[r.id]==null?'':me.r[r.id]}"><button onclick="sr('${r.id}')">Сақтау</button></div></div>`).join('');
+ h+='<h2>Сабақ бағалары</h2>';let any=0;
+ for(let k=0;k<14;k++){
+  const dt=new Date(n);dt.setDate(n.getDate()-k);const ds=ymd(dt);
+  const ls=lo(dt.getDay()).filter(l=>k>0||hm(l.s)<=m);
+  if(!ls.length)continue;any=1;
+  h+=`<h2>${ds} · ${D[dt.getDay()]}</h2>`+ls.map(l=>{const key=ds+'|'+l.id;return `<div class="c"><b>${l.s}</b> ${esc(sn(l.sub))}<div class="f"><input id="g_${key}" type="number" min="0" max="100" placeholder="0–100" value="${me.g[key]==null?'':me.g[key]}"><button onclick="sg('${key}')">Сақтау</button></div></div>`}).join('');
+ }
+ return h+(any?'':'<div class="c mu">Баға қоятын өткен сабақ жоқ.</div>');
+}
+async function sg(k){const v=$('g_'+k).value;if(ck(v)){me.g[k]=+v;await sv()}}
+async function sr(k){const v=$('r_'+k).value;if(ck(v)){me.r[k]=+v;await sv()}}
+function stats(){
+ const a={},add=(s,v)=>{(a[s]=a[s]||[]).push(v)};
+ for(const[k,v]of Object.entries(me.g)){const l=cfg.les.find(x=>x.id==k.split('|')[1]);if(l)add(l.sub,v)}
+ for(const[k,v]of Object.entries(me.r)){const r=cfg.rk.find(x=>x.id==k);if(r)add(r.sub,v)}
+ return cfg.sub.filter(s=>a[s.id]).map(s=>{const m=a[s.id].reduce((x,y)=>x+y,0)/a[s.id].length;return Object.assign({},s,{m,p:pt(m)})});
+}
+function vGpa(){
+ ST=stats();if(!ST.length)return '<div class="c mu">Әзірге баға жоқ.</div>';
+ let c=0,q=0;ST.forEach(s=>{c+=s.cr;q+=s.cr*s.p});
+ return `<div class="c"><span class="mu">GPA</span><div style="font-size:34px;font-weight:700">${(q/c).toFixed(2)}</div></div>`+ST.map(s=>`<div class="c"><b>${esc(s.name)}</b> · ${s.cr} кр<br><span class="mu">Орташа ${s.m.toFixed(1)} · GPA ұпайы ${s.p}</span></div>`).join('');
+}
+function vCalc(){
+ ST=stats();
+ return `<div class="c"><label class="mu">Пән (міндетті емес)</label><select id="cs" onchange="fc()"><option value="">—</option>${ST.map(s=>`<option value="${s.m.toFixed(1)}">${esc(s.name)}</option>`).join('')}</select>
+ <label class="mu">Қазіргі қорытынды балл</label><input id="c1" type="number">
+ <label class="mu">Керек қорытынды балл</label><input id="c2" type="number">
+ <label class="mu">Рейтингтің үлесі, % (қалғаны емтихан)</label><input id="c3" type="number" value="60">
+ <div class="f"><button onclick="calc()">Есептеу</button></div><p id="co"></p></div>`;
+}
+function fc(){$('c1').value=$('cs').value}
+function calc(){
+ const c=+$('c1').value,t=+$('c2').value,w=Math.min(Math.max((+$('c3').value||60)/100,.01),.99),x=(t-w*c)/(1-w);
+ $('co').innerHTML=x>100?`Емтиханда ${x.toFixed(1)} балл керек, яғни 100 жетпейді. Бұл баллға жету мүмкін емес.`:x<=0?'Емтихансыз да жетеді.':`Емтиханнан кемінде <b>${Math.ceil(x)}</b> балл алу керек.`;
+}
+function vAd(){
+ const so=cfg.sub.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+ let h=`<h2>Студенттер</h2><div class="c"><input id="un" placeholder="Логин (латынша)"><input id="up" placeholder="Пароль (кемінде 4)"><input id="uf" placeholder="Аты-жөні"><div class="f"><button onclick="aU()">Аккаунт ашу / пароль өзгерту</button></div></div>`;
+ h+=us.map(u=>`<div class="c">${esc(u.n)} <span class="mu">${esc(u.u)}${u.a?' · админ':''}</span> ${u.a?'':`<button class="x" onclick="dU('${esc(u.u)}')">Өшіру</button>`}</div>`).join('');
+ h+=`<h2>Пәндер</h2><div class="c"><div class="f"><input id="sn" placeholder="Пән атауы"><input id="sk" type="number" placeholder="Кредит" style="width:90px"><button onclick="aS()">Қосу</button></div></div>`;
+ h+=cfg.sub.map(s=>`<div class="c"><b>${esc(s.name)}</b> · ${s.cr} кр <button class="x" onclick="dS('${s.id}')">Өшіру</button><div class="f"><input id="rn_${s.id}" placeholder="РК1 / Сессия"><button onclick="aR('${s.id}')">Рубежка ашу</button></div></div>`).join('');
+ if(cfg.rk.length)h+='<h2>Рубежкалар</h2>'+cfg.rk.map(r=>`<div class="c">${esc(sn(r.sub))} · ${esc(r.name)} <span class="mu">${r.open?'ашық':'жабық'}</span> <button onclick="tR('${r.id}')">${r.open?'Жабу':'Ашу'}</button> <button class="x" onclick="dR('${r.id}')">Өшіру</button></div>`).join('');
+ h+=`<h2>Сабақ қосу</h2><div class="c"><select id="ld">${[1,2,3,4,5,6].map(d=>`<option value="${d}">${D[d]}</option>`).join('')}</select><select id="ls">${so}</select><div class="f" style="margin-top:6px"><input id="l1" type="time"><input id="l2" type="time"></div><input id="lr" placeholder="Кабинет"><div class="f"><button onclick="aL()">Қосу</button></div></div>`;
+ return h+cfg.les.slice().sort((a,b)=>a.d-b.d||hm(a.s)-hm(b.s)).map(l=>`<div class="c">${D[l.d].slice(0,3)} ${l.s}–${l.e} ${esc(sn(l.sub))} <button class="x" onclick="dL('${l.id}')">×</button></div>`).join('');
+}
+async function aU(){
+ const u=$('un').value.trim().toLowerCase(),p=$('up').value,n=$('uf').value.trim();
+ if(!/^[a-z0-9_.-]{2,}$/.test(u)||p.length<4){toast('Логин латынша, пароль кемінде 4 таңба');return}
+ try{await api('app_add_user',{t:tk,u,p,n});toast('Аккаунт дайын');await load()}catch(e){toast('Қате')}
+}
+async function dU(u){try{await api('app_del_user',{t:tk,u});await load()}catch(e){toast('Қате')}}
+async function aS(){const n=$('sn').value.trim();if(!n)return;cfg.sub.push({id:uidn(),name:n,cr:+$('sk').value||3});await sc()}
+async function dS(i){cfg.sub=cfg.sub.filter(s=>s.id!=i);cfg.les=cfg.les.filter(l=>l.sub!=i);cfg.rk=cfg.rk.filter(r=>r.sub!=i);await sc()}
+async function aR(i){const n=$('rn_'+i).value.trim()||'Рубежка';cfg.rk.push({id:uidn(),sub:i,name:n,open:true});await sc()}
+async function tR(i){const r=cfg.rk.find(x=>x.id==i);r.open=!r.open;await sc()}
+async function dR(i){cfg.rk=cfg.rk.filter(r=>r.id!=i);await sc()}
+async function aL(){const s=$('ls').value,a=$('l1').value,b=$('l2').value;if(!s||!a||!b){toast('Пән мен уақытты толтыр');return}cfg.les.push({id:uidn(),d:+$('ld').value,s:a,e:b,sub:s,r:$('lr').value.trim()});await sc()}
+async function dL(i){cfg.les=cfg.les.filter(l=>l.id!=i);await sc()}
+function render(){
+ const a=$('app');
+ if(!tk){a.innerHTML=`<header>ПГС-26К · Студент порталы</header><main><div class="c"><b>Кіру</b><input id="lu" placeholder="Логин" autocapitalize="none"><input id="lp" type="password" placeholder="Пароль"><div class="f"><button onclick="lg()">Кіру</button></div><p class="mu">Аккаунтты админ ашады.</p></div></main>`;return}
+ const T=[['sch','Кесте'],['gr','Бағалар'],['gpa','GPA'],['calc','Есептегіш']].concat(admin?[['adm','Админ']]:[]);
+ if(!T.some(t=>t[0]==tab))tab='sch';
+ const v={sch:vSch,gr:vGr,gpa:vGpa,calc:vCalc,adm:vAd}[tab]();
+ a.innerHTML=`<header><span>ПГС-26К${nm?' · '+esc(nm):''}</span><button onclick="out()">Шығу</button></header><main>${v}</main><nav>${T.map(t=>`<button class="${t[0]==tab?'on':''}" onclick="tab='${t[0]}';render()">${t[1]}</button>`).join('')}</nav>`;
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&tk)load()});
+tk?load():render();
+</script></body></html>
